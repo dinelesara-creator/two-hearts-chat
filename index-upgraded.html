@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>WeChat</title>
+
+  <meta name="theme-color" content="#180c24">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #100917;
+      --panel: rgba(38, 23, 47, .88);
+      --pink: #ff86b5;
+      --purple: #bd9cff;
+      --text: #fff5fb;
+      --muted: #c7b5ca;
+      --border: rgba(255,255,255,.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 15%, #54234f 0, transparent 42%),
+        radial-gradient(ellipse at 90% 80%, #312260 0, transparent 40%),
+        var(--bg);
+      font-family: "DM Sans", sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    button { cursor: pointer; }
+
+    .heart {
+      position: fixed;
+      z-index: -1;
+      color: rgba(255,134,181,.22);
+      font-size: 24px;
+      animation: float 10s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .heart:nth-child(1) { left: 8%; top: 20%; }
+    .heart:nth-child(2) { right: 12%; top: 30%; animation-delay: -3s; }
+    .heart:nth-child(3) { left: 25%; bottom: 12%; animation-delay: -6s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-10deg); }
+      50% { transform: translateY(-28px) rotate(10deg); }
+    }
+
+    .wrap {
+      width: min(900px, 100%);
+      margin: auto;
+      padding: 24px 16px;
+    }
+
+    .brand {
+      text-align: center;
+      margin: 10px 0 24px;
+    }
+
+    .brand h1 {
+      font: 700 clamp(32px, 7vw, 48px) "Playfair Display", serif;
+      margin: 0;
+      background: linear-gradient(90deg, #fff, #ff9cc7, #c5a9ff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .brand p { color: var(--muted); margin: 8px 0; }
+
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px #0005;
+      overflow: hidden;
+    }
+
+    .login {
+      max-width: 430px;
+      margin: auto;
+      padding: 28px;
+    }
+
+    h2 {
+      font: 600 25px "Playfair Display", serif;
+      margin-top: 0;
+    }
+
+    .field { margin: 16px 0; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      color: white;
+      background: #ffffff0c;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+    }
+
+    input:focus { border-color: var(--pink); }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #260f25;
+      background: linear-gradient(120deg, #ff9cc7, #d1b3ff);
+      font-weight: 700;
+    }
+
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .secondary {
+      background: #ffffff10;
+      color: white;
+      border: 1px solid var(--border);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .actions .btn { flex: 1; }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 18px;
+    }
+
+    #status {
+      color: var(--pink);
+      font-size: 13px;
+      min-height: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .chat { display: none; }
+
+    .chat-header {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff8bbd, #a58aff);
+      font-size: 23px;
+      box-shadow: 0 0 25px #ff86b533;
+    }
+
+    .partner-info { flex: 1; min-width: 0; }
+
+    .partner-info strong {
+      display: block;
+      font: 600 19px "Playfair Display", serif;
+    }
+
+    .partner-info small {
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    #onlineDot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #8b8290;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    #onlineDot.online { background: #65f0ad; }
+
+    #messages {
+      height: min(55vh, 570px);
+      min-height: 300px;
+      padding: 20px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      text-align: center;
+      margin: auto;
+      color: var(--muted);
+      line-height: 1.8;
+      padding: 20px;
+    }
+
+    .bubble {
+      max-width: 82%;
+      padding: 11px 14px 8px;
+      border: 1px solid var(--border);
+      border-radius: 18px 18px 18px 5px;
+      background: #ffffff0c;
+      align-self: flex-start;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .bubble.mine {
+      align-self: flex-end;
+      border-radius: 18px 18px 5px 18px;
+      background: linear-gradient(135deg, #633457, #44316a);
+    }
+
+    .bubble .sender {
+      color: #ffb4d2;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .bubble time {
+      display: block;
+      text-align: right;
+      color: #e0cddd;
+      font-size: 10px;
+      margin-top: 7px;
+    }
+
+    .composer {
+      padding: 13px;
+      border-top: 1px solid var(--border);
+      background: #10091755;
+    }
+
+    .emoji-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .emoji {
+      border: 0;
+      border-radius: 9px;
+      padding: 5px 8px;
+      background: #ffffff0d;
+      color: white;
+      font-size: 19px;
+    }
+
+    .send-row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .send-row input { min-width: 0; flex: 1; }
+
+    .send-row .btn { flex: 0 0 auto; }
+
+    .foot {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 16px;
+    }
+
+
+    .reply-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--pink);
+      border-radius: 10px;
+      background: #ffffff0a;
+    }
+    .reply-bar.active { display: flex; }
+    .reply-copy { flex: 1; min-width: 0; }
+    .reply-copy strong { display:block; color: var(--pink); font-size: 12px; }
+    .reply-copy span { display:block; color: var(--muted); font-size: 12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tool-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px; }
+    .tool-btn {
+      border:1px solid var(--border); border-radius:10px; padding:8px 10px;
+      background:#ffffff0d; color:var(--text); font-size:13px;
+    }
+    .tool-btn:hover { border-color:var(--pink); }
+    .tool-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .bubble-tools { display:flex; gap:6px; justify-content:flex-end; margin-top:8px; }
+    .bubble-tools button { border:0; border-radius:8px; padding:4px 7px; background:#ffffff12; color:#ffe7f2; font-size:11px; }
+    .reply-quote { border-left:3px solid var(--pink); background:#0002; padding:6px 9px; border-radius:6px; margin-bottom:8px; font-size:12px; color:#f2cfe0; }
+    .media-image { display:block; max-width:min(320px, 100%); max-height:360px; object-fit:contain; border-radius:12px; margin-top:5px; }
+    .media-audio { display:block; width:min(290px, 100%); margin-top:8px; }
+    .deleted-message { color:#d7c7d8; font-style:italic; }
+    .tool-status { font-size:12px; color:var(--muted); margin:4px 0 0; overflow-wrap:anywhere; }
+    .hidden-file { display:none; }
+
+    @media (max-width: 480px) {
+      .wrap { padding: 14px 9px; }
+      .login { padding: 21px; }
+      .chat-header { padding: 13px; }
+      #messages { height: 58vh; min-height: 280px; }
+      .bubble { max-width: 90%; }
+      .send-row .btn { padding: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="heart">♡</div>
+  <div class="heart">♥</div>
+  <div class="heart">♡</div>
+
+  <main class="wrap">
+    <header class="brand">
+      <h1>WeChat💗</h1>
+      <p>Te amor . Me amor </p>
+    </header>
+
+    <section id="loginCard" class="card login">
+      <h2>Verification</h2>
+      <p class="hint">
+        Sign in with your own account
+        to open your conversation.
+      </p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" autocomplete="username"
+                 required placeholder="Your email address">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password"
+                 autocomplete="current-password" required
+                 placeholder="Your password">
+        </div>
+
+        <button class="btn" id="loginButton" type="submit"
+                style="width:100%">Enter</button>
+      </form>
+
+      <p id="status" role="status" aria-live="polite"></p>
+
+      
+    </section>
+
+    <section id="chatCard" class="card chat">
+      <header class="chat-header">
+        <div class="avatar">💗</div>
+
+        <div class="partner-info">
+          <strong>You</strong>
+          <small id="currentUser"></small>
+          <small>
+            <span id="onlineDot"></span>
+            <span id="onlineText">Connecting...</span>
+          </small>
+        </div>
+
+        <button class="btn secondary" id="logoutButton"
+                type="button">Log out</button>
+      </header>
+
+      <div id="messages" aria-live="polite">
+        <div class="welcome">
+          <div style="font-size:42px">💌</div>
+          Send your message here.
+        </div>
+      </div>
+
+      <form id="messageForm" class="composer">
+        <div id="replyBar" class="reply-bar" aria-live="polite">
+          <div class="reply-copy">
+            <strong>Replying to</strong>
+            <span id="replyText"></span>
+          </div>
+          <button id="cancelReplyButton" class="tool-btn" type="button" aria-label="Cancel reply">✕</button>
+        </div>
+        <div class="tool-row">
+          <button id="imageButton" class="tool-btn" type="button">+Photo</button>
+          <input id="imageInput" class="hidden-file" type="file" accept="image/*">
+          <button id="recordButton" class="tool-btn" type="button">🎙️ Record voice</button>
+          <button id="stopRecordButton" class="tool-btn" type="button" hidden>⏹ Stop</button>
+          <span id="recordingLabel" class="tool-status" aria-live="polite"></span>
+        </div>
+        <div class="emoji-row" aria-label="Quick emojis">
+          <button class="emoji" type="button">❤️</button>
+          <button class="emoji" type="button">🥹</button>
+          <button class="emoji" type="button">😘</button>
+          <button class="emoji" type="button">🫶</button>
+          <button class="emoji" type="button">💕</button>
+          <button class="emoji" type="button">🌹</button>
+          <button class="emoji" type="button">🥰</button>
+          <button class="emoji" type="button">💋</button>
+          <button class="emoji" type="button">😗</button>
+          <button class="emoji" type="button">😋</button>
+          <button class="emoji" type="button">😛</button>
+          <button class="emoji" type="button">🥺</button>
+          <button class="emoji" type="button">😢</button>
+          <button class="emoji" type="button">😭</button>
+          <button class="emoji" type="button">😮‍💨</button>
+          <button class="emoji" type="button">😤</button>
+
+
+
+      </div>
+
+        <div class="send-row">
+          <input id="messageInput" maxlength="4000"
+                 placeholder="Type your message here..."
+                 autocomplete="off" required>
+          <button id="sendButton" class="btn" type="submit">Send</button>
+        </div>
+
+        <p id="chatStatus" class="hint" role="status"
+           aria-live="polite"></p>
+      </form>
+    </section>
+
+    <footer class="foot">
+      Made with love, @taz.esara ♡
+    </footer>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    // Replace both values with your own Supabase project details.
+    const SUPABASE_URL = "https://gmleavjaysgrbigjwnuq.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ZAJS_Mlwv5_lYSMneDOa0w_aELXTRQ1";
+
+    // Use exactly the same two addresses as in the SQL policies.
+    const ALLOWED_EMAILS = [
+      "dinelesara@gmail.com",
+      "webchat099@gmail.com"
+    ].map(email => email.toLowerCase());
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const $ = id => document.getElementById(id);
+
+    let currentUser = null;
+    let messageChannel = null;
+    let presenceChannel = null;
+    let knownMessageIds = new Set();
+    let messageCache = new Map();
+    let replyTarget = null;
+    let busy = false;
+    let mediaBusy = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recordingStream = null;
+
+    const MEDIA_BUCKET = "couple-media";
+    const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+    const MAX_VOICE_BYTES = 12 * 1024 * 1024;
+
+    function setStatus(message) {
+      $("status").textContent = message;
+    }
+
+    function setChatStatus(message) {
+      $("chatStatus").textContent = message;
+    }
+
+    function isAllowed(email) {
+      return !!email && ALLOWED_EMAILS.includes(email.toLowerCase());
+    }
+
+    function formatTimestamp(value) {
+      const date = new Date(value);
+
+      return date.toLocaleDateString([], {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      }) + " · " + date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function showLogin(message = "") {
+      $("loginCard").style.display = "block";
+      $("chatCard").style.display = "none";
+      setStatus(message);
+    }
+
+    function safeText(value, max = 180) {
+      const text = String(value || "").trim();
+      return text.length > max ? text.slice(0, max) + "…" : text;
+    }
+
+    async function renderMessage(message) {
+      if (!message || !message.id) return;
+      if (knownMessageIds.has(message.id)) return;
+
+      knownMessageIds.add(message.id);
+      messageCache.set(String(message.id), message);
+
+      const welcome = $("messages").querySelector(".welcome");
+      if (welcome) welcome.remove();
+
+      const mine = (message.sender_email || "").toLowerCase() ===
+        (currentUser.email || "").toLowerCase();
+
+      const bubble = document.createElement("article");
+      bubble.className = "bubble" + (mine ? " mine" : "");
+      bubble.dataset.messageId = String(message.id);
+
+      const sender = document.createElement("div");
+      sender.className = "sender";
+      sender.textContent = mine ? "You" : "Your Partner";
+      bubble.appendChild(sender);
+
+      if (message.reply_to_id) {
+        const original = messageCache.get(String(message.reply_to_id));
+        const quote = document.createElement("div");
+        quote.className = "reply-quote";
+        quote.textContent = original
+          ? "↩ " + safeText(original.body || (original.media_type === "image" ? "Photo" : "Voice message"))
+          : "↩ Replied to a message";
+        bubble.appendChild(quote);
+      }
+
+      if (message.deleted_at) {
+        const deleted = document.createElement("div");
+        deleted.className = "deleted-message";
+        deleted.textContent = "This message was deleted";
+        bubble.appendChild(deleted);
+      } else {
+        if (message.body) {
+          const body = document.createElement("div");
+          body.textContent = message.body;
+          bubble.appendChild(body);
+        }
+
+        if (message.media_path && message.media_type) {
+          const { data, error } = await supabase.storage
+            .from(MEDIA_BUCKET)
+            .createSignedUrl(message.media_path, 60 * 30);
+
+          if (!error && data?.signedUrl) {
+            if (message.media_type.startsWith("image/")) {
+              const image = document.createElement("img");
+              image.className = "media-image";
+              image.src = data.signedUrl;
+              image.alt = "Shared image";
+              image.loading = "lazy";
+              image.addEventListener("click", () => window.open(data.signedUrl, "_blank", "noopener"));
+              bubble.appendChild(image);
+            } else if (message.media_type.startsWith("audio/")) {
+              const audio = document.createElement("audio");
+              audio.className = "media-audio";
+              audio.controls = true;
+              audio.preload = "metadata";
+              audio.src = data.signedUrl;
+              bubble.appendChild(audio);
+            } else {
+              const link = document.createElement("a");
+              link.href = data.signedUrl;
+              link.target = "_blank";
+              link.rel = "noopener";
+              link.textContent = "Open attachment";
+              bubble.appendChild(link);
+            }
+          } else {
+            const unavailable = document.createElement("div");
+            unavailable.className = "tool-status";
+            unavailable.textContent = "Media unavailable. Check your private Storage policies.";
+            bubble.appendChild(unavailable);
+          }
+        }
+      }
+
+      const time = document.createElement("time");
+      time.dateTime = message.created_at;
+      time.textContent = formatTimestamp(message.created_at);
+      bubble.appendChild(time);
+
+      if (!message.deleted_at) {
+        const tools = document.createElement("div");
+        tools.className = "bubble-tools";
+
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.textContent = "↩ Reply";
+        replyButton.addEventListener("click", () => setReplyTarget(message));
+        tools.appendChild(replyButton);
+
+        if (mine) {
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.textContent = "🗑 Delete";
+          deleteButton.addEventListener("click", () => deleteMessage(message));
+          tools.appendChild(deleteButton);
+        }
+        bubble.appendChild(tools);
+      }
+
+      $("messages").appendChild(bubble);
+      $("messages").scrollTop = $("messages").scrollHeight;
+    }
+
+    async function loadHistory() {
+      $("messages").replaceChildren();
+      knownMessageIds.clear();
+      messageCache.clear();
+
+      const { data, error } = await supabase
+        .from("messages")
+        .select("id, sender_email, body, created_at, reply_to_id, media_path, media_type, deleted_at")
+        .order("created_at", { ascending: true })
+        .limit(500);
+
+      if (error) {
+        setChatStatus("Could not load messages: " + error.message +
+          " (check that the SQL migration has been applied)");
+        return;
+      }
+
+      if (!data.length) {
+        const welcome = document.createElement("div");
+        welcome.className = "welcome";
+        welcome.textContent = "Send your messages here.";
+        $("messages").appendChild(welcome);
+        return;
+      }
+
+      // Cache the full page first so replies can resolve even if ordering varies.
+      data.forEach(message => messageCache.set(String(message.id), message));
+      data.forEach(message => messageCache.delete(String(message.id)));
+      for (const message of data) await renderMessage(message);
+    }
+
+    function setReplyTarget(message) {
+      replyTarget = message;
+      $("replyText").textContent = safeText(message.body ||
+        (message.media_type?.startsWith("image/") ? "Photo" : "Voice message"));
+      $("replyBar").classList.add("active");
+      $("messageInput").focus();
+    }
+
+    function clearReplyTarget() {
+      replyTarget = null;
+      $("replyBar").classList.remove("active");
+      $("replyText").textContent = "";
+    }
+
+    async function deleteMessage(message) {
+      if (!currentUser || (message.sender_email || "").toLowerCase() !== currentUser.email.toLowerCase()) return;
+      if (!window.confirm("Delete this message for both of you?")) return;
+
+      const { error } = await supabase
+        .from("messages")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", message.id)
+        .eq("sender_email", currentUser.email);
+
+      if (error) {
+        setChatStatus("Could not delete message: " + error.message);
+        return;
+      }
+      setChatStatus("Message deleted.");
+    }
+
+    async function uploadAndSendMedia(file, kind) {
+      if (!currentUser || mediaBusy || busy) return;
+      if (!file) return;
+
+      const maxBytes = kind === "image" ? MAX_IMAGE_BYTES : MAX_VOICE_BYTES;
+      if (file.size > maxBytes) {
+        setChatStatus(kind === "image" ? "Choose an image smaller than 8 MB." : "Voice message must be smaller than 12 MB.");
+        return;
+      }
+      if (kind === "image" && !file.type.startsWith("image/")) {
+        setChatStatus("Please select an image file.");
+        return;
+      }
+      if (kind === "voice" && !file.type.startsWith("audio/")) {
+        setChatStatus("This browser's recording format is not supported.");
+        return;
+      }
+
+      mediaBusy = true;
+      $("imageButton").disabled = true;
+      $("recordButton").disabled = true;
+      setChatStatus("Uploading " + (kind === "image" ? "image..." : "voice message..."));
+
+      const extension = (file.name?.split(".").pop() || (kind === "image" ? "jpg" : "webm"))
+        .replace(/[^a-zA-Z0-9]/g, "").slice(0, 8) || "bin";
+      const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
+
+      const { error: uploadError } = await supabase.storage
+        .from(MEDIA_BUCKET)
+        .upload(path, file, { contentType: file.type, upsert: false });
+
+      if (uploadError) {
+        mediaBusy = false;
+        $("imageButton").disabled = false;
+        $("recordButton").disabled = false;
+        setChatStatus("Upload failed: " + uploadError.message);
+        return;
+      }
+
+      const { error: insertError } = await supabase.from("messages").insert({
+        sender_email: currentUser.email,
+        body: "",
+        reply_to_id: replyTarget ? String(replyTarget.id) : null,
+        media_path: path,
+        media_type: file.type || (kind === "image" ? "image/jpeg" : "audio/webm")
+      });
+
+      if (insertError) {
+        await supabase.storage.from(MEDIA_BUCKET).remove([path]);
+        setChatStatus("Media uploaded but message could not be saved: " + insertError.message);
+      } else {
+        clearReplyTarget();
+        setChatStatus(kind === "image" ? "Image sent." : "Voice message sent.");
+      }
+
+      mediaBusy = false;
+      $("imageButton").disabled = false;
+      $("recordButton").disabled = false;
+    }
+
+    async function startVoiceRecording() {
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        setChatStatus("Voice recording is not supported by this browser. Try a recent browser over HTTPS.");
+        return;
+      }
+      try {
+        recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        const preferred = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"]
+          .find(type => MediaRecorder.isTypeSupported(type));
+        mediaRecorder = preferred
+          ? new MediaRecorder(recordingStream, { mimeType: preferred })
+          : new MediaRecorder(recordingStream);
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+          if (event.data && event.data.size) recordedChunks.push(event.data);
+        });
+        mediaRecorder.addEventListener("stop", async () => {
+          const mime = mediaRecorder?.mimeType || "audio/webm";
+          const blob = new Blob(recordedChunks, { type: mime });
+          recordingStream?.getTracks().forEach(track => track.stop());
+          recordingStream = null;
+          $("stopRecordButton").hidden = true;
+          $("recordButton").disabled = false;
+          $("recordingLabel").textContent = "";
+          if (blob.size) {
+            const ext = mime.includes("ogg") ? "ogg" : mime.includes("mp4") ? "m4a" : "webm";
+            const file = new File([blob], "voice-message." + ext, { type: mime });
+            await uploadAndSendMedia(file, "voice");
+          }
+          mediaRecorder = null;
+        });
+        mediaRecorder.start();
+        $("recordButton").disabled = true;
+        $("stopRecordButton").hidden = false;
+        $("recordingLabel").textContent = "● Recording…";
+        setChatStatus("Recording. Press Stop when you're done.");
+      } catch (error) {
+        recordingStream?.getTracks().forEach(track => track.stop());
+        recordingStream = null;
+        setChatStatus("Microphone permission was denied or unavailable.");
+      }
+    }
+
+    async function sendMessage(event) {
+      event.preventDefault();
+      if (!currentUser || busy || mediaBusy) return;
+
+      const input = $("messageInput");
+      const body = input.value.trim();
+      if (!body) {
+        setChatStatus("Type a message, attach a photo, or record a voice message.");
+        return;
+      }
+
+      busy = true;
+      $("sendButton").disabled = true;
+      setChatStatus("Sending...");
+
+      const payload = {
+        sender_email: currentUser.email,
+        body,
+        reply_to_id: replyTarget ? String(replyTarget.id) : null
+      };
+
+      const { error } = await supabase.from("messages").insert(payload);
+
+      busy = false;
+      $("sendButton").disabled = false;
+
+      if (error) {
+        setChatStatus("Message not sent: " + error.message +
+          " (check the SQL migration and your Supabase RLS policies)");
+        return;
+      }
+
+      input.value = "";
+      clearReplyTarget();
+      input.focus();
+      setChatStatus("Message sent.");
+    }
+
+    function stopChannels() {
+      if (messageChannel) {
+        supabase.removeChannel(messageChannel);
+        messageChannel = null;
+      }
+
+      if (presenceChannel) {
+        supabase.removeChannel(presenceChannel);
+        presenceChannel = null;
+      }
+
+      $("onlineDot").classList.remove("online");
+      $("onlineText").textContent = "Offline";
+    }
+
+    function startMessageUpdates() {
+      stopChannels();
+
+      messageChannel = supabase
+        .channel("couple-message-updates")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "messages" },
+          payload => {
+            if (currentUser) renderMessage(payload.new);
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "messages" },
+          async payload => {
+            if (!currentUser || !payload.new?.id) return;
+            const oldNode = $("messages").querySelector('[data-message-id="' + CSS.escape(String(payload.new.id)) + '"]');
+            if (oldNode) oldNode.remove();
+            knownMessageIds.delete(payload.new.id);
+            knownMessageIds.delete(String(payload.new.id));
+            messageCache.delete(String(payload.new.id));
+            await renderMessage(payload.new);
+          }
+        )
+        .subscribe(status => {
+          if (status === "SUBSCRIBED") {
+            setChatStatus("Connected to your conversation.");
+          } else if (status === "CHANNEL_ERROR") {
+            setChatStatus(
+              "Live updates are unavailable. Check your connection."
+            );
+          }
+        });
+    }
+
+    function startPresence() {
+      // This presence channel is for a basic prototype.
+      // Configure private Realtime channels and appropriate Realtime
+      // authorization policies before relying on presence for privacy.
+
+      presenceChannel = supabase.channel("couple-online-presence", {
+        config: {
+          presence: { key: currentUser.email.toLowerCase() }
+        }
+      });
+
+      function updatePresence() {
+        const state = presenceChannel.presenceState();
+        const emails = Object.keys(state).map(email => email.toLowerCase());
+
+        const otherIsOnline = emails.some(
+          email => email !== currentUser.email.toLowerCase()
+            && isAllowed(email)
+        );
+
+        $("onlineDot").classList.toggle("online", otherIsOnline);
+        $("onlineText").textContent = otherIsOnline
+          ? "Partner is online 💚"
+          : "Partner is offline";
+      }
+
+      presenceChannel
+        .on("presence", { event: "sync" }, updatePresence)
+        .subscribe(async status => {
+          if (status === "SUBSCRIBED") {
+            await presenceChannel.track({
+              email: currentUser.email.toLowerCase(),
+              online_at: new Date().toISOString()
+            });
+
+            updatePresence();
+          }
+        });
+    }
+
+    async function openChat(user) {
+      if (!isAllowed(user.email)) {
+        await supabase.auth.signOut();
+        currentUser = null;
+        showLogin("This account is not authorized.");
+        return;
+      }
+
+      currentUser = user;
+
+      $("loginCard").style.display = "none";
+      $("chatCard").style.display = "block";
+      $("currentUser").textContent = user.email;
+
+      await loadHistory();
+      startMessageUpdates();
+      startPresence();
+    }
+
+    $("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (SUPABASE_URL.startsWith("YOUR_") ||
+          SUPABASE_KEY.startsWith("YOUR_")) {
+        setStatus("Add your Supabase project URL and publishable key.");
+        return;
+      }
+
+      const email = $("email").value.trim().toLowerCase();
+      const password = $("password").value;
+
+      if (!isAllowed(email)) {
+        setStatus("This email is not one of the two approved accounts.");
+        return;
+      }
+
+      const button = $("loginButton");
+      button.disabled = true;
+      setStatus("Signing in...");
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      button.disabled = false;
+
+      if (error) {
+        setStatus("Sign-in failed. Check your email and password.");
+        return;
+      }
+
+      if (!isAllowed(data.user.email)) {
+        await supabase.auth.signOut();
+        setStatus("This account is not authorized.");
+        return;
+      }
+
+      setStatus("");
+      await openChat(data.user);
+    });
+
+    $("messageForm").addEventListener("submit", sendMessage);
+
+    document.querySelectorAll(".emoji").forEach(button => {
+      button.addEventListener("click", () => {
+        const input = $("messageInput");
+        input.value += button.textContent;
+        input.focus();
+      });
+    });
+
+    $("cancelReplyButton").addEventListener("click", clearReplyTarget);
+
+    $("imageButton").addEventListener("click", () => $("imageInput").click());
+    $("imageInput").addEventListener("change", async event => {
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (file) await uploadAndSendMedia(file, "image");
+    });
+
+    $("recordButton").addEventListener("click", startVoiceRecording);
+    $("stopRecordButton").addEventListener("click", () => {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+      recordingStream?.getTracks().forEach(track => track.stop());
+      recordingStream = null;
+      clearReplyTarget();
+      stopChannels();
+      await supabase.auth.signOut();
+      currentUser = null;
+      showLogin("You have been logged out.");
+    });
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        stopChannels();
+        currentUser = null;
+        showLogin();
+      }
+    });
+
+    // Restore the login session after a page refresh.
+    async function restoreSession() {
+      if (SUPABASE_URL.startsWith("YOUR_") ||
+          SUPABASE_KEY.startsWith("YOUR_")) return;
+
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error || !data.session) return;
+
+      const user = data.session.user;
+
+      if (!isAllowed(user.email)) {
+        await supabase.auth.signOut();
+        showLogin("This account is not authorized.");
+        return;
+      }
+
+      await openChat(user);
+    }
+
+    restoreSession();
+  </script>
+</body>
+</html>
